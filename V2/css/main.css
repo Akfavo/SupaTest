@@ -1,0 +1,440 @@
+/* ==========================================================================
+   Design System & Main Stylesheet - SupaTest V2 (Notion Minimalist Theme)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Color Palette - Notion Dark Minimalist */
+  --bg-app: #191919;
+  --bg-sidebar: #202020;
+  --bg-surface: #252525;
+  --bg-surface-hover: #2f2f2f;
+  --bg-surface-active: #373737;
+  --bg-card: #202020;
+  --bg-input: #191919;
+  --bg-code: #121212;
+
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+  --border-focus: #38bdf8;
+
+  --text-main: #ffffff;
+  --text-muted: #d4d4d8;
+  --text-dim: #a1a1aa;
+  --text-link: #60a5fa;
+
+  /* Notion Tag & Status Colors (Subtle & Pastel) */
+  --primary: #2383e2;
+  --primary-glow: rgba(35, 131, 226, 0.18);
+  --primary-hover: #1d74c6;
+  --primary-active: #1765ad;
+  --primary-text: #ffffff;
+
+  --accent-blue: #60a5fa;
+  --accent-purple: #c084fc;
+
+  --status-success: #34d399;
+  --status-success-bg: rgba(16, 185, 129, 0.2);
+  --status-warning: #fbbf24;
+  --status-warning-bg: rgba(245, 158, 11, 0.2);
+  --status-danger: #f87171;
+  --status-danger-bg: rgba(239, 68, 68, 0.2);
+  --status-info: #38bdf8;
+  --status-info-bg: rgba(56, 189, 248, 0.2);
+
+  /* Typography - Notion System Font Stack */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Notion Minimalist Shapes (Subtle Radii) */
+  --sidebar-width: 300px;
+  --header-height: 54px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.45);
+  --transition: all 0.12s ease-in-out;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+/* App Container Layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* HUD Top Header (Notion Breadcrumb / Title Bar Style) */
+.app-header {
+  height: var(--header-height);
+  background-color: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  z-index: 20;
+  gap: 1rem;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 200px;
+}
+
+.brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  display: block;
+}
+
+.brand-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-main);
+}
+
+.brand-badge {
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 0.1rem 0.4rem;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+
+/* Active Session / Role Identity HUD (Notion Tag Group Style) */
+.hud-active-identity {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.3rem 0.75rem;
+  gap: 0.85rem;
+  max-width: 750px;
+  flex: 1;
+}
+
+.hud-role-container {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-right: 1px solid var(--border-subtle);
+  padding-right: 0.75rem;
+}
+
+.hud-role-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.hud-role-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--status-success);
+}
+
+.hud-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  border-right: 1px solid var(--border-subtle);
+  padding-right: 0.75rem;
+}
+
+.hud-info-item:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+
+.hud-info-label {
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.hud-info-value {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Main Workspace Body */
+.app-workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Sidebar (Notion Page Hierarchy Sidebar Style) */
+.app-sidebar {
+  width: var(--sidebar-width);
+  min-width: 260px;
+  max-width: 340px;
+  background-color: var(--bg-sidebar);
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height));
+  overflow-y: auto;
+}
+
+.sidebar-section {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-section-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+/* Project Quick Status */
+.project-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.project-card:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-surface-hover);
+}
+
+.project-card-url {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-blue);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.project-card-status {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+/* Personas List (Notion Item List Style) */
+.personas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.persona-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.persona-item:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.persona-item.active {
+  background-color: var(--bg-surface-active);
+  border-color: var(--border-strong);
+}
+
+.persona-info {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  overflow: hidden;
+}
+
+.persona-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.persona-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.persona-name {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.persona-role-label {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.persona-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.persona-item:hover .persona-actions {
+  opacity: 1;
+}
+
+/* Main Content Area */
+.main-view {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--header-height));
+  background-color: var(--bg-app);
+  overflow-y: auto;
+}
+
+/* Navigation Tabs (Notion Database View Tabs Style) */
+.view-nav {
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  background-color: var(--bg-sidebar);
+  border-bottom: 1px solid var(--border-subtle);
+  gap: 0.25rem;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.nav-tab:hover {
+  color: var(--text-main);
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.nav-tab.active {
+  color: #ffffff;
+  border-bottom-color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* Main Content Panel */
+.tab-content {
+  display: none;
+  padding: 1.25rem;
+  flex: 1;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}

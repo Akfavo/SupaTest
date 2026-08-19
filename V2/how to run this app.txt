@@ -1,0 +1,17 @@
+
+Comment utiliser SupaTest
+
+
+1 - Ouvrir le terminal puis taper la commande : 
+
+cd "<chemin ou ce trouve le dossier du projet" (exemple cd "c:/documents/SupaTest")
+
+
+2 -Une fois le folder du projet ciblé, taper : 
+
+Npm start
+
+3 - Récupérer l'URL localhost et l'ouvrir dans votre navigateur pour avoir accès a SupaTest : http://localhost:3000
+
+
+4 - Pour arrêter le localhost, simplement fermer le terminal
