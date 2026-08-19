@@ -1,8 +1,6 @@
-# SupaTest
-tester, auditer et valider les politiques de sécurité Row Level Security (RLS) et les accès par rôles (RBAC) sans friction
-# ⚡ SupaTest — Supabase RLS & Role Tester
+ # ⚡ SupaTest — Supabase RLS & Role Tester
 
-Application web moderne, fluide et 100% locale dédiée aux développeurs et créateurs no-code travaillant avec Supabase pour **tester, auditer et valider les politiques de sécurité Row Level Security (RLS) et les accès par rôles (RBAC) sans friction**.
+Application web moderne, fluide et 100% client-side (sans backend requis) dédiée aux développeurs et créateurs no-code travaillant avec Supabase pour **tester, auditer et valider les politiques de sécurité Row Level Security (RLS) et les accès par rôles (RBAC) sans friction**.
 
 ---
 
@@ -29,8 +27,8 @@ Fini la corvée et la complexité de Postman :
 ### 1. Configuration Initiale
 1. Cliquez sur l'encadré **"Projet Actif"** dans la barre latérale gauche.
 2. Renseignez votre **URL de projet** (ex: `https://votre-projet.supabase.co`).
-3. Renseignez votre **Clé Publique (Anon Key)**. *(Ne collez jamais votre `service_role` key).*
-4. Cliquez sur **"Enregistrer le Projet"**. *(Ces clés restent 100% sécurisées dans le `localStorage` de votre navigateur).*
+3. Renseignez votre **Clé Publique (Anon Key)**. *(Ne collez jamais votre clé secrète `service_role`).*
+4. Cliquez sur **"Enregistrer le Projet"**. *(Ces clés restent 100% privées dans le `localStorage` de votre navigateur).*
 
 ### 2. Gestion des Personas de Test
 1. Dans la barre latérale gauche, cliquez sur **"+ Ajouter"**.
@@ -71,7 +69,8 @@ Fini la corvée et la complexité de Postman :
 ---
 
 ## 🔒 Sécurité & Confidentialité
-- **100% Local & Client-Side** : SupaTest fonctionne exclusivement dans votre navigateur web.
-- Aucune donnée ne transite par un serveur tiers : vos appels vont directement de votre machine vers votre instance Supabase.
-- Toutes vos configurations (URLs, personas, favoris, schéma mémorisé) sont conservées dans le `localStorage` de votre navigateur.
-- Exportez et restaurez l'intégralité de vos données quand vous le souhaitez grâce au bouton **"💾 Exporter"**.
+
+- **100% Client-Side (Zéro backend intermédiaire)** : Même hébergée en ligne sur Vercel, GitHub Pages ou Netlify, l'application s'exécute exclusivement et directement dans votre navigateur web.
+- **Connexion directe Supabase** : Toutes les requêtes HTTP sont envoyées directement depuis votre navigateur vers votre projet Supabase via HTTPS. Aucune donnée ne transite par un serveur tiers.
+- **Stockage local & privé** : Vos URLs de projet, clés publiques anon, comptes personas, tokens JWT et favoris sont stockés exclusivement dans le `localStorage` de votre navigateur.
+- **Sauvegarde et Transfert** : Utilisez les boutons **"💾 Exporter"** et **"📥 Importer"** pour sauvegarder votre environnement de travail ou le déplacer d'une machine à une autre en 1 clic.
