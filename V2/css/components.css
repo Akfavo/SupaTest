@@ -33,18 +33,20 @@
 .btn-primary {
   background-color: var(--primary);
   border-color: var(--primary);
-  color: #ffffff;
-  font-weight: 500;
+  color: #042314;
+  font-weight: 600;
+  box-shadow: 0 1px 3px var(--primary-glow);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
   border-color: var(--primary-hover);
-  color: #ffffff;
+  color: #042314;
 }
 
 .btn-primary:active {
   background-color: var(--primary-active);
+  border-color: var(--primary-active);
 }
 
 .btn-secondary {
@@ -254,14 +256,14 @@
 
 .column-pill-btn:hover {
   background-color: var(--bg-surface-hover);
-  border-color: var(--border-strong);
-  color: #38bdf8;
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .column-pill-btn.active {
-  background-color: rgba(56, 189, 248, 0.22);
-  border-color: #38bdf8;
-  color: #38bdf8;
+  background-color: rgba(62, 207, 142, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
   font-weight: 600;
 }
 
@@ -754,13 +756,13 @@
 }
 
 .sql-recipe-title {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: var(--accent-blue);
+  color: var(--primary);
 }
 
 .sql-recipe-desc {
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
   margin-bottom: 0.55rem;
   line-height: 1.4;
@@ -773,7 +775,7 @@
   padding: 0.65rem;
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: #6db5e8;
+  color: #3ecf8e;
   overflow-x: auto;
   white-space: pre;
   margin-bottom: 0.4rem;

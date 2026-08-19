@@ -17,25 +17,26 @@
 
   --border-subtle: rgba(255, 255, 255, 0.1);
   --border-strong: rgba(255, 255, 255, 0.18);
-  --border-focus: #38bdf8;
+  --border-focus: #3ecf8e;
 
   --text-main: #ffffff;
   --text-muted: #d4d4d8;
   --text-dim: #a1a1aa;
-  --text-link: #60a5fa;
+  --text-link: #3ecf8e;
 
-  /* Notion Tag & Status Colors (Subtle & Pastel) */
-  --primary: #2383e2;
-  --primary-glow: rgba(35, 131, 226, 0.18);
-  --primary-hover: #1d74c6;
-  --primary-active: #1765ad;
-  --primary-text: #ffffff;
+  /* Supabase Emerald Green Accent */
+  --primary: #3ecf8e;
+  --primary-glow: rgba(62, 207, 142, 0.2);
+  --primary-hover: #34b27b;
+  --primary-active: #2a9d68;
+  --primary-text: #042314;
 
-  --accent-blue: #60a5fa;
+  --accent-green: #3ecf8e;
+  --accent-blue: #38bdf8;
   --accent-purple: #c084fc;
 
-  --status-success: #34d399;
-  --status-success-bg: rgba(16, 185, 129, 0.2);
+  --status-success: #3ecf8e;
+  --status-success-bg: rgba(62, 207, 142, 0.18);
   --status-warning: #fbbf24;
   --status-warning-bg: rgba(245, 158, 11, 0.2);
   --status-danger: #f87171;
@@ -271,7 +272,7 @@ html, body {
 .project-card-url {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  color: var(--accent-blue);
+  color: var(--primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -408,7 +409,7 @@ html, body {
 
 .nav-tab.active {
   color: #ffffff;
-  border-bottom-color: var(--accent-blue);
+  border-bottom-color: var(--primary);
   font-weight: 600;
 }
 
