@@ -112,6 +112,7 @@
         <nav class="view-nav">
           <div class="nav-tab active" data-tab="playground">🧪 Query & RLS Playground</div>
           <div class="nav-tab" data-tab="matrix">⚡ Matrice Multi-Rôles</div>
+          <div class="nav-tab" data-tab="qos">📊 Test QoS</div>
           <div class="nav-tab" data-tab="jwt">🔍 Inspecteur JWT & Claims</div>
           <div class="nav-tab" data-tab="schema">📂 Schéma & Tables</div>
           <div class="nav-tab" data-tab="history">⏱️ Historique</div>
@@ -226,7 +227,7 @@
                 <span style="color:var(--text-dim);">Taille : <strong id="resSize" style="color:var(--text-main);">1.2 KB</strong></span>
               </div>
               <div class="response-view-toggles">
-                <button class="toggle-btn active" id="viewRawToggle">JSON Formatté</button>
+                <button class="toggle-btn active" id="viewRawToggle">JSON Formaté</button>
                 <button class="toggle-btn" id="viewTableToggle">Tableau</button>
               </div>
             </div>
@@ -276,6 +277,85 @@
           </div>
         </section>
 
+        <!-- Tab QoS: Performance & Load Test -->
+        <section class="tab-content" id="tabContent-qos">
+          <div class="card" style="margin-bottom: 1.25rem;">
+            <div class="card-header">
+              <div>
+                <div class="card-title">📊 Test de Performance & QoS (Qualité de Service)</div>
+                <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.25rem;">
+                  Exécute la requête configurée dans le Playground plusieurs fois d'affilée pour mesurer la latence et la stabilité.
+                </div>
+              </div>
+              <button class="btn btn-secondary btn-sm" id="exportQosReportBtn" style="display:none;" title="Télécharger un rapport Markdown QoS">
+                📄 Exporter le Rapport (Markdown)
+              </button>
+            </div>
+
+            <!-- Active query configuration reminder -->
+            <div class="qos-query-preview" id="qosQueryPreview" style="background:var(--bg-input); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.6rem 0.8rem; margin-top:0.75rem; font-family:var(--font-mono); font-size:0.78rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:0.5rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span class="method-badge method-GET" id="qosMethodBadge">GET</span>
+                <span style="color:var(--text-main); font-weight:600;" id="qosTargetDisplay">/rest/v1/...</span>
+              </div>
+              <div style="color:var(--text-dim); font-size:0.72rem;">
+                Persona actif : <strong style="color:var(--text-main);" id="qosPersonaDisplay">Visiteur Public</strong>
+              </div>
+            </div>
+
+            <!-- Form Controls -->
+            <div style="display:flex; align-items:flex-end; gap:1rem; margin-top:1rem; flex-wrap:wrap;">
+              <div class="form-group" style="margin-bottom:0; width:220px;">
+                <label class="form-label" for="qosRepeatInput">Nombre de répétitions</label>
+                <input type="number" class="form-input form-input-mono" id="qosRepeatInput" min="1" max="100" value="20" placeholder="20" />
+              </div>
+              <button class="btn btn-primary" id="startQosTestBtn" style="height:34px;">
+                🚀 Lancer le test de charge
+              </button>
+            </div>
+          </div>
+
+          <!-- Results Summary Card -->
+          <div class="card" id="qosResultsContainer" style="display:none;">
+            <div class="card-title" style="margin-bottom:0.75rem;">📈 Résultats du Test QoS</div>
+            
+            <!-- Stats Grid -->
+            <div class="qos-stats-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:0.75rem; margin-bottom:1.25rem;">
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.75rem;">
+                <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">Latence Moyenne</div>
+                <div style="font-size:1.2rem; font-weight:700; color:var(--primary); font-family:var(--font-mono); margin-top:0.25rem;" id="qosStatAvg">0 ms</div>
+              </div>
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.75rem;">
+                <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">Min / Max</div>
+                <div style="font-size:1.1rem; font-weight:600; color:var(--text-main); font-family:var(--font-mono); margin-top:0.25rem;" id="qosStatMinMax">0 / 0 ms</div>
+              </div>
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.75rem;">
+                <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">p95 (95e percentile)</div>
+                <div style="font-size:1.2rem; font-weight:700; color:var(--accent-blue); font-family:var(--font-mono); margin-top:0.25rem;" id="qosStatP95">0 ms</div>
+              </div>
+              <div style="background:var(--bg-surface); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:0.75rem;">
+                <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">Taux de succès</div>
+                <div style="font-size:1.2rem; font-weight:700; color:var(--status-success); font-family:var(--font-mono); margin-top:0.25rem;" id="qosStatSuccessRate">100%</div>
+              </div>
+            </div>
+
+            <!-- Execution Details Table -->
+            <table class="matrix-table">
+              <thead>
+                <tr>
+                  <th style="width:80px;">Itération</th>
+                  <th>Statut HTTP</th>
+                  <th>Latence</th>
+                  <th>Verdict</th>
+                </tr>
+              </thead>
+              <tbody id="qosTableBody">
+                <!-- Rendered via JS -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <!-- Tab 3: JWT & Claims Inspector -->
         <section class="tab-content" id="tabContent-jwt">
           <div class="card" style="margin-bottom:1rem;">
@@ -299,8 +379,9 @@
                   Découverte automatique des tables et colonnes via PostgREST OpenAPI.
                 </div>
               </div>
-              <div style="display:flex; gap:0.5rem;">
+              <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
                 <button type="button" class="btn btn-secondary btn-sm" id="schemaRefreshTabBtn">🔄 Actualiser le Schéma</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="schemaBatchImportBtn">📋 Importer la liste de mes tables</button>
                 <button type="button" class="btn btn-primary btn-sm" id="schemaAddManualTableBtn">+ Ajouter une Table</button>
               </div>
             </div>
@@ -449,6 +530,23 @@ WITH CHECK (auth.uid() = user_id);">📋 Copier</button>
             </div>
             <div class="sql-code-box">ALTER TABLE ma_table ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "CRUD pour le propriétaire" ON ma_table FOR ALL TO authenticated USING (auth.uid() = user_id);</div>
+          </div>
+
+          <!-- Recipe 6 -->
+          <div class="sql-recipe-card">
+            <div class="sql-recipe-header">
+              <div class="sql-recipe-title">🔄 6. Forcer l'affichage de TOUTES les tables dans l'API (Recharger PostgREST)</div>
+              <button class="btn btn-secondary btn-sm copy-sql-btn" data-sql="-- Rendre toutes les tables du schéma public visibles via l'API
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+NOTIFY pgrst, 'reload schema';">📋 Copier</button>
+            </div>
+            <div class="sql-recipe-desc">
+              Si certaines tables créées récemment n'apparaissent pas dans le menu déroulant, exécutez ce script dans votre <strong>Supabase SQL Editor</strong> pour forcer l'API à rafraîchir son catalogue.
+            </div>
+            <div class="sql-code-box">GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+NOTIFY pgrst, 'reload schema';</div>
           </div>
         </div>
         <div class="modal-footer">

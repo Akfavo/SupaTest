@@ -315,7 +315,7 @@
   white-space: nowrap;
 }
 
-.table-selector-input {
+.table-selector-select, .table-selector-input {
   background: transparent;
   border: none;
   color: var(--text-main);
@@ -324,7 +324,15 @@
   font-weight: 500;
   width: 100%;
   outline: none;
-  padding-left: 0.2rem;
+  padding: 0.2rem 0;
+  cursor: pointer;
+}
+
+.table-selector-select option {
+  background-color: var(--bg-surface);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  padding: 0.4rem 0.6rem;
 }
 
 /* Query Builder Section */

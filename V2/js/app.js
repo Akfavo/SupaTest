@@ -44,6 +44,9 @@ class App {
     // Favorites list
     this.renderFavorites();
 
+    // Table datalist
+    this.populateTableDatalist();
+
     // Add initial filter row in playground
     const filterContainer = document.getElementById('filterRowsContainer');
     if (filterContainer && filterContainer.children.length === 0) {
@@ -156,8 +159,12 @@ class App {
       this.schemaData.tables || [],
       (tableName) => {
         // Jump to playground
-        document.getElementById('queryTableInput').value = tableName;
+        const tableInput = document.getElementById('queryTableInput');
+        if (tableInput) {
+          tableInput.value = tableName;
+        }
         this.updateAvailableColumnsDatalist();
+        this.updateColumnPills();
         this.switchTab('playground');
         UI.showToast(`Table "${tableName}" prête pour vos tests dans le Playground`, 'info');
       },
@@ -255,6 +262,7 @@ class App {
     } else {
       // If OpenAPI root is restricted on this Supabase tier, use learned tables
       this.renderSchemaExplorer();
+      this.populateTableDatalist();
       if (showNotification) {
         const count = (this.schemaData.tables || []).length;
         if (count > 0) {
@@ -267,7 +275,7 @@ class App {
   }
 
   addManualTablePrompt() {
-    const tableName = prompt('Entrez le nom de la table Supabase (ex: commentaire, profil, commande) :');
+    const tableName = prompt('Entrez le nom de la table Supabase (ex: commentaire, profil, commande, users, lecon) :');
     if (!tableName || !tableName.trim()) return;
 
     const cleanName = tableName.trim().toLowerCase();
@@ -298,7 +306,58 @@ class App {
 
     this.renderSchemaExplorer();
     this.populateTableDatalist();
+
+    const tableInput = document.getElementById('queryTableInput');
+    if (tableInput) tableInput.value = cleanName;
+    this.updateAvailableColumnsDatalist();
+    this.updateColumnPills();
     UI.showToast(`Table "${cleanName}" ajoutée avec succès !`, 'success');
+  }
+
+  addBatchTablesPrompt() {
+    const raw = prompt(
+      'Collez la liste de vos tables Supabase (séparées par des virgules ou retours à la ligne) :\nExemple : lecon, cours, profils, utilisateurs, commentaires, modules'
+    );
+    if (!raw || !raw.trim()) return;
+
+    const names = raw
+      .split(/[\n,;]+/)
+      .map(n => n.trim().toLowerCase())
+      .filter(n => n.length > 0);
+
+    if (names.length === 0) return;
+
+    if (!this.schemaData.tables) this.schemaData.tables = [];
+
+    let addedCount = 0;
+    names.forEach(name => {
+      const exists = this.schemaData.tables.some(t => t.name === name);
+      if (!exists) {
+        this.schemaData.tables.push({
+          name,
+          methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+          description: 'Importée en lot',
+          columns: [
+            { name: 'id', type: 'integer', required: true },
+            { name: 'created_at', type: 'timestamp', required: false }
+          ]
+        });
+        addedCount++;
+      }
+    });
+
+    Storage.setSchemaCache(this.schemaData);
+    this.renderSchemaExplorer();
+    this.populateTableDatalist();
+
+    if (names[0]) {
+      const tableInput = document.getElementById('queryTableInput');
+      if (tableInput) tableInput.value = names[0];
+      this.updateAvailableColumnsDatalist();
+      this.updateColumnPills();
+    }
+
+    UI.showToast(`${addedCount} table(s) ajoutée(s) avec succès !`, 'success');
   }
 
   populateTableDatalist() {
@@ -313,7 +372,6 @@ class App {
       datalist.appendChild(opt);
     });
 
-    // Update filter columns and column pills based on currently typed table
     this.updateAvailableColumnsDatalist();
     this.updateColumnPills();
   }
@@ -716,6 +774,196 @@ class App {
     UI.showToast('Rapport d\'audit Markdown téléchargé !', 'success');
   }
 
+  updateQosQueryPreview() {
+    const method = document.getElementById('queryMethodSelect')?.value || 'GET';
+    const table = document.getElementById('queryTableInput')?.value.trim() || 'nom_de_la_table';
+    const methodBadge = document.getElementById('qosMethodBadge');
+    const targetDisplay = document.getElementById('qosTargetDisplay');
+    const personaDisplay = document.getElementById('qosPersonaDisplay');
+
+    if (methodBadge) {
+      methodBadge.className = `method-badge method-${method}`;
+      methodBadge.textContent = method;
+    }
+    if (targetDisplay) {
+      targetDisplay.textContent = `/rest/v1/${table}`;
+    }
+    if (personaDisplay) {
+      personaDisplay.textContent = `${this.activePersona?.name || 'Visiteur Public'} (${this.activePersona?.role || 'anon'})`;
+    }
+  }
+
+  async executeQosTest() {
+    try {
+      const queryConfig = this.getQueryConfigFromUI();
+      if (!queryConfig.table) {
+        UI.showToast('Veuillez renseigner le nom d\'une table dans le Playground avant de lancer le test QoS.', 'warning');
+        return;
+      }
+
+      const repeatInput = document.getElementById('qosRepeatInput');
+      let reps = parseInt(repeatInput?.value || '20', 10);
+      if (isNaN(reps) || reps < 1) reps = 1;
+      if (reps > 100) reps = 100;
+      if (repeatInput) repeatInput.value = reps;
+
+      const startBtn = document.getElementById('startQosTestBtn');
+      const resultsContainer = document.getElementById('qosResultsContainer');
+      const exportBtn = document.getElementById('exportQosReportBtn');
+
+      if (startBtn) {
+        startBtn.disabled = true;
+        startBtn.textContent = `⏳ Test en cours (0/${reps})...`;
+      }
+
+      UI.showToast(`Lancement du test QoS (${reps} requêtes consécutives sur "${queryConfig.table}")...`, 'info', 2000);
+
+      const runs = [];
+
+      for (let i = 1; i <= reps; i++) {
+        if (startBtn) startBtn.textContent = `⏳ Exécution ${i}/${reps}...`;
+
+        const res = await SupabaseEngine.executeQuery({
+          projectConfig: this.projectConfig,
+          token: this.activeAuthState.token,
+          ...queryConfig
+        });
+
+        const isSuccess = res.success && res.status >= 200 && res.status < 300;
+        runs.push({
+          iteration: i,
+          status: res.status,
+          statusText: res.statusText || (isSuccess ? 'OK' : 'Erreur'),
+          latency: res.latency,
+          success: isSuccess,
+          verdict: res.rlsAnalysis?.title || (isSuccess ? 'Succès (Données reçues)' : 'Erreur')
+        });
+      }
+
+      // Compute statistics
+      const latencies = runs.map(r => r.latency);
+      const avgLatency = Math.round(latencies.reduce((a, b) => a + b, 0) / latencies.length);
+      const minLatency = Math.min(...latencies);
+      const maxLatency = Math.max(...latencies);
+
+      const sortedLatencies = [...latencies].sort((a, b) => a - b);
+      const p95Index = Math.min(Math.floor(0.95 * sortedLatencies.length), sortedLatencies.length - 1);
+      const p95Latency = sortedLatencies[p95Index];
+
+      const successCount = runs.filter(r => r.success).length;
+      const successRate = Math.round((successCount / runs.length) * 100);
+
+      // Render statistics cards
+      const avgEl = document.getElementById('qosStatAvg');
+      if (avgEl) avgEl.textContent = `${avgLatency} ms`;
+
+      const minMaxEl = document.getElementById('qosStatMinMax');
+      if (minMaxEl) minMaxEl.textContent = `${minLatency} ms / ${maxLatency} ms`;
+
+      const p95El = document.getElementById('qosStatP95');
+      if (p95El) p95El.textContent = `${p95Latency} ms`;
+
+      const successRateEl = document.getElementById('qosStatSuccessRate');
+      if (successRateEl) {
+        successRateEl.textContent = `${successRate}% (${successCount}/${reps})`;
+        successRateEl.style.color = successRate === 100 ? 'var(--status-success)' : (successRate >= 80 ? 'var(--status-warning)' : 'var(--status-danger)');
+      }
+
+      // Render detail table
+      const tableBody = document.getElementById('qosTableBody');
+      if (tableBody) {
+        tableBody.innerHTML = runs.map(r => `
+          <tr>
+            <td style="font-family:var(--font-mono); font-weight:600; color:var(--text-dim);">#${r.iteration}</td>
+            <td>
+              <span class="badge ${r.success ? 'badge-success' : 'badge-danger'}">${r.status} ${r.statusText}</span>
+            </td>
+            <td style="font-family:var(--font-mono); font-weight:600; color:var(--text-main);">${r.latency} ms</td>
+            <td style="font-size:0.75rem; color:var(--text-muted);">${r.verdict}</td>
+          </tr>
+        `).join('');
+      }
+
+      if (resultsContainer) resultsContainer.style.display = 'block';
+      if (exportBtn) exportBtn.style.display = 'inline-flex';
+
+      // Save for report export
+      this.lastQosResults = {
+        queryConfig,
+        reps,
+        persona: this.activePersona,
+        runs,
+        stats: {
+          avgLatency,
+          minLatency,
+          maxLatency,
+          p95Latency,
+          successCount,
+          successRate
+        },
+        timestamp: new Date().toISOString()
+      };
+
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.textContent = '🚀 Lancer le test de charge';
+      }
+
+      UI.showToast(`Test QoS terminé ! Latence moyenne : ${avgLatency} ms (Succès : ${successRate}%)`, 'success');
+    } catch (err) {
+      const startBtn = document.getElementById('startQosTestBtn');
+      if (startBtn) {
+        startBtn.disabled = false;
+        startBtn.textContent = '🚀 Lancer le test de charge';
+      }
+      UI.showToast(`Erreur lors du test QoS : ${err.message}`, 'error');
+    }
+  }
+
+  exportQosReport() {
+    if (!this.lastQosResults || !this.lastQosResults.runs) {
+      UI.showToast('Aucun résultat de test QoS à exporter. Exécutez d\'abord un test.', 'warning');
+      return;
+    }
+
+    const { queryConfig, reps, persona, runs, stats, timestamp } = this.lastQosResults;
+    const dateStr = new Date(timestamp).toLocaleString('fr-FR');
+
+    let md = `# 📊 Rapport de Test de Performance & QoS — SupaTest\n\n`;
+    md += `* **Date du test :** ${dateStr}\n`;
+    md += `* **Projet Supabase :** \`${this.projectConfig.url || 'Non configuré'}\`\n`;
+    md += `* **Endpoint testé :** \`${queryConfig.method} /rest/v1/${queryConfig.table}\`\n`;
+    md += `* **Persona actif :** **${persona?.name || 'Visiteur Public'}** (\`${persona?.role || 'anon'}\`)\n`;
+    md += `* **Nombre de répétitions :** ${reps}\n\n`;
+
+    md += `## 📈 Résumé des Métriques de Performance\n\n`;
+    md += `* **Latence moyenne :** \`${stats.avgLatency} ms\`\n`;
+    md += `* **Latence min / max :** \`${stats.minLatency} ms\` / \`${stats.maxLatency} ms\`\n`;
+    md += `* **p95 (95e percentile) :** \`${stats.p95Latency} ms\` *(95% des requêtes ont répondu sous cette durée)*\n`;
+    md += `* **Taux de succès :** \`${stats.successRate}%\` (${stats.successCount}/${reps} requêtes 2xx)\n\n`;
+
+    md += `## 📋 Détail des ${reps} Exécutions\n\n`;
+    md += `| Itération | Statut HTTP | Latence | Verdict |\n`;
+    md += `| :--- | :--- | :--- | :--- |\n`;
+
+    runs.forEach(r => {
+      md += `| #${r.iteration} | \`${r.status} ${r.statusText}\` | ${r.latency} ms | ${r.verdict} |\n`;
+    });
+
+    md += `\n## 📝 Paramètres de la Requête Testée\n\n`;
+    md += `\`\`\`json\n${JSON.stringify(queryConfig, null, 2)}\n\`\`\`\n\n`;
+    md += `*Rapport généré automatiquement par SupaTest — RLS & Performance Tester.*\n`;
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `rapport-qos-${queryConfig.table}-${new Date().toISOString().slice(0, 10)}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+    UI.showToast('Rapport QoS Markdown téléchargé !', 'success');
+  }
+
   openEditPersonaModal(persona = null) {
     const modalTitle = document.getElementById('personaModalTitle');
     const idInput = document.getElementById('personaIdInput');
@@ -797,6 +1045,10 @@ class App {
     document.querySelectorAll('.tab-content').forEach(content => {
       content.classList.toggle('active', content.id === `tabContent-${tabName}`);
     });
+
+    if (tabName === 'qos') {
+      this.updateQosQueryPreview();
+    }
   }
 
   renderHistory() {
@@ -963,6 +1215,10 @@ class App {
       this.addManualTablePrompt();
     });
 
+    document.getElementById('schemaBatchImportBtn')?.addEventListener('click', () => {
+      this.addBatchTablesPrompt();
+    });
+
     // Execute button
     document.getElementById('executeQueryBtn')?.addEventListener('click', () => {
       this.executeCurrentQuery();
@@ -996,6 +1252,15 @@ class App {
     // Matrix report export button
     document.getElementById('exportMatrixReportBtn')?.addEventListener('click', () => {
       this.exportMatrixReport();
+    });
+
+    // QoS test button & report export
+    document.getElementById('startQosTestBtn')?.addEventListener('click', () => {
+      this.executeQosTest();
+    });
+
+    document.getElementById('exportQosReportBtn')?.addEventListener('click', () => {
+      this.exportQosReport();
     });
 
     // Open SQL RLS CheatSheet modal button

@@ -26,7 +26,7 @@ Fini la corvée et la complexité de Postman :
 
 ### 1. Configuration Initiale
 1. Cliquez sur l'encadré **"Projet Actif"** dans la barre latérale gauche.
-2. Renseignez votre **URL de projet** (ex: `https://votre-projet.supabase.co`).
+2. Renseignez votre **URL de projet** (ex: `https://<project_id>.supabase.co`).
 3. Renseignez votre **Clé Publique (Anon Key)**. *(Ne collez jamais votre clé secrète `service_role`).*
 4. Cliquez sur **"Enregistrer le Projet"**. *(Ces clés restent 100% privées dans le `localStorage` de votre navigateur).*
 
@@ -47,7 +47,7 @@ Fini la corvée et la complexité de Postman :
    - **Pour PATCH** : Renseignez simplement `"id": "xxx"` et vos modifications dans le JSON, SupaTest cible automatiquement la bonne ligne en base !
 5. Cliquez sur **"▶️ Exécuter (Rôle Actif)"** :
    - Statut HTTP, latence, nombre total de lignes en base (`Prefer: count=exact`) et diagnostic RLS immédiat.
-   - Basculez à volonté entre la vue **JSON Formatté** et la vue **Tableau**.
+   - Basculez à volonté entre la vue **JSON Formaté** et la vue **Tableau**.
 
 ### 4. ⭐ Sauvegarder des Requêtes Favorites
 * Cliquez sur l'étoile **`⭐`** dans la barre de requête pour enregistrer vos configurations de test.

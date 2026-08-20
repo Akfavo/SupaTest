@@ -106,21 +106,29 @@ export class SupabaseEngine {
         }
       },
       {
-        name: 'Anon Key Query Parameter',
-        url: `${cleanUrl}/rest/v1/?apikey=${encodeURIComponent(anonKey)}`,
-        headers: {
-          'apikey': anonKey,
-          'Authorization': `Bearer ${anonKey}`,
-          'Accept': 'application/openapi+json'
-        }
-      },
-      {
-        name: 'Anon Key Wildcard Accept',
+        name: 'Anon Key Standard JSON',
         url: `${cleanUrl}/rest/v1/`,
         headers: {
           'apikey': anonKey,
           'Authorization': `Bearer ${anonKey}`,
           'Accept': 'application/json, */*'
+        }
+      },
+      {
+        name: 'Anon Key Direct Headers',
+        url: `${cleanUrl}/rest/v1/`,
+        headers: {
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`
+        }
+      },
+      {
+        name: 'Anon Key Query Parameter',
+        url: `${cleanUrl}/rest/v1/?apikey=${encodeURIComponent(anonKey)}`,
+        headers: {
+          'apikey': anonKey,
+          'Authorization': `Bearer ${anonKey}`,
+          'Accept': 'application/openapi+json, application/json, */*'
         }
       }
     ];
@@ -133,7 +141,7 @@ export class SupabaseEngine {
         headers: {
           'apikey': anonKey,
           'Authorization': `Bearer ${token}`,
-          'Accept': 'application/openapi+json'
+          'Accept': 'application/openapi+json, application/json, */*'
         }
       });
     }
