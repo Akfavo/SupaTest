@@ -49,6 +49,9 @@
         <button class="btn btn-secondary btn-sm" id="openSqlCheatSheetBtn" title="Consulter et copier des modèles de règles SQL RLS">
           💡 Modèles RLS SQL
         </button>
+        <button class="btn btn-secondary btn-sm" id="openErrorCodesBtn" title="Consulter la liste des codes d'erreur PostgREST / Postgres">
+          🚨 Codes d'erreur
+        </button>
       </div>
     </header>
 
@@ -140,6 +143,9 @@
             </button>
             <button class="btn btn-secondary btn-lg" id="executeMatrixBtn" title="Tester cette requête avec tous les rôles simultanément">
               ⚡ Matrice RLS
+            </button>
+            <button class="btn btn-secondary btn-lg" id="copyCurlBtn" title="Copier la requête en commande cURL avec les headers et le token">
+              📋 Copier en cURL
             </button>
           </div>
 
@@ -548,6 +554,72 @@ NOTIFY pgrst, 'reload schema';">📋 Copier</button>
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO anon, authenticated;
 NOTIFY pgrst, 'reload schema';</div>
           </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary modal-cancel-btn">Fermer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PostgREST / Postgres Error Codes Modal -->
+    <div class="modal-backdrop" id="errorCodesModal">
+      <div class="modal-dialog modal-dialog-large">
+        <div class="modal-header">
+          <div>
+            <div class="modal-title">🚨 Codes d'erreur PostgREST / Postgres</div>
+            <div style="font-size:0.75rem; color:var(--text-dim); margin-top:2px;">
+              Référence des codes d'erreur fréquents retournés par Supabase et PostgREST.
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-icon modal-close-btn">✕</button>
+        </div>
+        <div class="modal-body">
+          <table class="matrix-table" style="width:100%;">
+            <thead>
+              <tr>
+                <th style="width:140px;">Code Postgres</th>
+                <th style="width:110px;">Code HTTP</th>
+                <th>Signification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">23505</code></td>
+                <td><span class="badge badge-danger">409</span></td>
+                <td>Violation UNIQUE (doublon)</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">42501</code></td>
+                <td><span class="badge badge-danger">403</span></td>
+                <td>RLS bloque (permission refusée)</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">23514</code></td>
+                <td><span class="badge badge-danger">422</span></td>
+                <td>Violation CHECK</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">23503</code></td>
+                <td><span class="badge badge-danger">409</span></td>
+                <td>Violation clé étrangère</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">22007</code></td>
+                <td><span class="badge badge-danger">400</span></td>
+                <td>Format de donnée invalide (ex: date)</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">PGRST301</code></td>
+                <td><span class="badge badge-danger">401</span></td>
+                <td>Token JWT absent ou invalide</td>
+              </tr>
+              <tr>
+                <td><code style="color:var(--status-danger); font-weight:700; font-family:var(--font-mono);">PGRST116</code></td>
+                <td><span class="badge badge-danger">404</span></td>
+                <td>Ressource introuvable / paramètre invalide</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary modal-cancel-btn">Fermer</button>

@@ -16,6 +16,9 @@ Fini la corvée et la complexité de Postman :
 - ✅ **Ciblage intelligent pour PATCH** : Modifiez vos lignes par ID sans avoir à construire d'URL complexe.
 - ✅ **Auto-apprentissage du Schéma** : Mémorisation instantanée des tables et types lors de chaque requête.
 - ✅ **⚡ Matrice Multi-Rôles** : Exécutez votre requête sur tous vos rôles simultanément et exportez un rapport d'audit Markdown (`.md`).
+- ✅ **📊 Test de Performance & QoS** : Mesurez la latence réelle, la stabilité (Moyenne, Min/Max, p95) et le taux de succès sur N requêtes séquentielles avec export Markdown.
+- ✅ **📋 Copier en cURL** : Exportez instantanément la requête active en commande cURL avec ses headers et son Bearer token.
+- ✅ **🚨 Codes d'erreur PostgREST** : Aide-mémoire intégré pour diagnostiquer en 1 clic les codes d'erreur Supabase et Postgres (23505, 42501, PGRST...).
 - ✅ **💡 Modèles SQL RLS intégrés** : Aide-mémoire interactif avec copie en 1 clic des 5 patterns de sécurité Supabase indispensables.
 - ✅ **⭐ Gestionnaire de Favoris** : Sauvegardez et restaurez vos requêtes de test préférées en un clic.
 - ✅ **🛡️ Protection anti-suppression accidentelle** : Confirmation de sécurité sur les `DELETE` sans clause `WHERE`.
@@ -59,10 +62,26 @@ Fini la corvée et la complexité de Postman :
 3. SupaTest teste la requête en parallèle pour **tous vos personas** et dresse un tableau comparatif de sécurité.
 4. Cliquez sur **"📄 Exporter le Rapport (Markdown)"** pour télécharger un compte-rendu d'audit `.md` complet prêt pour vos livrables ou présentations.
 
-### 6. 💡 Aide-Mémoire & Modèles SQL RLS
+### 6. 📊 Test de Performance & QoS (Charge Séquentielle)
+1. Configurez votre requête dans le Playground (méthode, table, filtres, persona actif).
+2. Rendez-vous dans l'onglet **"📊 Test QoS"**.
+3. Définissez le **Nombre de répétitions** (ex: 20, 50 ou 100 requêtes).
+4. Cliquez sur **"🚀 Lancer le test de charge"** : SupaTest exécute les requêtes séquentiellement et affiche la progression en temps réel (`⏳ Exécution X/N...`).
+5. Analysez les métriques clés générées :
+   - **Latence Moyenne** (ms)
+   - **Latence Min / Max** (ms)
+   - **p95** (95e percentile — 95% des requêtes sous cette durée)
+   - **Taux de succès** (% de requêtes `2xx` vs erreurs)
+   - Tableau détaillé de chaque itération.
+6. Cliquez sur **"📄 Exporter le Rapport (Markdown)"** pour télécharger le bilan complet `.md`.
+
+### 7. 💡 Aide-Mémoire & Modèles SQL RLS
 * Cliquez sur **`💡 Modèles RLS SQL`** dans le bandeau supérieur pour accéder aux 5 modèles de politiques de sécurité SQL les plus utilisés sur Supabase, prêts à être copiés en un clic.
 
-### 7. 🔍 Inspecteur JWT & 📂 Schéma
+### 8. 🚨 Codes d'erreur PostgREST / Postgres
+* Cliquez sur **`🚨 Codes d'erreur`** dans le bandeau supérieur pour ouvrir la table de correspondance des codes d'erreur Supabase les plus fréquents (`23505`, `42501`, `PGRST301`...).
+
+### 9. 🔍 Inspecteur JWT & 📂 Schéma
 * **Inspecteur JWT** : Visualisez et décodez l'ensemble des claims, métadonnées (`app_metadata`, `user_metadata`) et dates d'expiration du token actif.
 * **Schéma & Tables** : Consultez vos tables mémorisées, leurs colonnes et types, ou ajoutez manuellement de nouvelles tables en 1 clic.
 

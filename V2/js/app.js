@@ -956,12 +956,77 @@ class App {
 
     const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
     a.href = url;
     a.download = `rapport-qos-${queryConfig.table}-${new Date().toISOString().slice(0, 10)}.md`;
     a.click();
     URL.revokeObjectURL(url);
     UI.showToast('Rapport QoS Markdown téléchargé !', 'success');
+  }
+
+  copyAsCurl() {
+    try {
+      const config = this.getQueryConfigFromUI();
+      if (!config.table) {
+        UI.showToast('Veuillez renseigner le nom d\'une table avant de copier en cURL.', 'warning');
+        return;
+      }
+
+      const projectUrl = this.projectConfig.url || 'https://votre-projet.supabase.co';
+      const anonKey = this.projectConfig.anonKey || 'VOTRE_CLE_ANON';
+      const token = this.activeAuthState.token || anonKey;
+
+      const queryParams = new URLSearchParams();
+      if (config.method === 'GET' && config.select) {
+        queryParams.set('select', config.select.trim());
+      }
+      if (Array.isArray(config.filters)) {
+        for (const filter of config.filters) {
+          if (filter.column && filter.op && filter.value !== undefined && filter.value !== '') {
+            queryParams.set(filter.column.trim(), `${filter.op}.${filter.value.trim()}`);
+          }
+        }
+      }
+      if (config.order) queryParams.set('order', config.order.trim());
+      if (config.limit) queryParams.set('limit', String(config.limit));
+      if (config.offset) queryParams.set('offset', String(config.offset));
+
+      const queryString = queryParams.toString();
+      const endpointUrl = `${projectUrl}/rest/v1/${config.table}${queryString ? '?' + queryString : ''}`;
+
+      let curlCmd = `curl -X ${config.method} '${endpointUrl}' \\\n`;
+      curlCmd += `  -H 'apikey: ${anonKey}' \\\n`;
+      curlCmd += `  -H 'Authorization: Bearer ${token}'`;
+
+      if (config.method === 'POST' || config.method === 'PATCH') {
+        curlCmd += ` \\\n  -H 'Content-Type: application/json'`;
+        curlCmd += ` \\\n  -H 'Prefer: return=representation'`;
+        if (config.body) {
+          const bodyStr = typeof config.body === 'string' ? config.body : JSON.stringify(config.body);
+          curlCmd += ` \\\n  -d '${bodyStr.replace(/'/g, "'\\''")}'`;
+        }
+      } else if (config.method === 'GET') {
+        curlCmd += ` \\\n  -H 'Prefer: count=exact'`;
+      } else if (config.method === 'DELETE') {
+        curlCmd += ` \\\n  -H 'Prefer: return=representation'`;
+      }
+
+      const btn = document.getElementById('copyCurlBtn');
+      const originalText = btn ? btn.innerHTML : '📋 Copier en cURL';
+
+      navigator.clipboard.writeText(curlCmd).then(() => {
+        if (btn) {
+          btn.innerHTML = '✅ Copié !';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+          }, 2000);
+        }
+        UI.showToast('Commande cURL copiée dans le presse-papier !', 'success', 2000);
+      }).catch(() => {
+        prompt('Copiez votre commande cURL ci-dessous :', curlCmd);
+      });
+    } catch (err) {
+      UI.showToast(`Erreur lors de la génération cURL : ${err.message}`, 'error');
+    }
   }
 
   openEditPersonaModal(persona = null) {
@@ -1263,9 +1328,19 @@ class App {
       this.exportQosReport();
     });
 
+    // Copy as cURL button
+    document.getElementById('copyCurlBtn')?.addEventListener('click', () => {
+      this.copyAsCurl();
+    });
+
     // Open SQL RLS CheatSheet modal button
     document.getElementById('openSqlCheatSheetBtn')?.addEventListener('click', () => {
       UI.openModal('sqlCheatSheetModal');
+    });
+
+    // Open PostgREST / Postgres Error Codes modal button
+    document.getElementById('openErrorCodesBtn')?.addEventListener('click', () => {
+      UI.openModal('errorCodesModal');
     });
 
     // Copy SQL from CheatSheet cards
